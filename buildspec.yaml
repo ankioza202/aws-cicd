@@ -1,6 +1,15 @@
 version: 0.2
 
 phases:
+  install:
+      runtime-versions:
+      java: corretto17
+      docker: 20
+      commands:
+      - echo Installing Maven...
+      - curl -sL https://rpmfind.net/linux/centos/7.9.2009/os/x86_64/Packages/maven-3.6.3-10.el7.noarch.rpm -o maven.rpm
+      - sudo yum install -y maven.rpm
+      - echo Maven installed successfully.
   pre_build:
     commands:
       - mvn clean install
