@@ -1,21 +1,12 @@
 version: 0.2
 
 phases:
-  install:
-      runtime-versions:
-      java: corretto17
-      docker: 20
-      commands:
-      - echo Installing Maven...
-      - curl -sL https://rpmfind.net/linux/centos/7.9.2009/os/x86_64/Packages/maven-3.6.3-10.el7.noarch.rpm -o maven.rpm
-      - sudo yum install -y maven.rpm
-      - echo Maven installed successfully.
   pre_build:
     commands:
       - mvn clean install
       - echo Logging in to Amazon ECR...
       - aws --version
-      - REPOSITORY_URI=184644494180.dkr.ecr.us-east-2.amazonaws.com/demo-registry
+      - REPOSITORY_URI=184644494180.dkr.ecr.us-east-2.amazonaws.com/javatechie-registry
       - aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin $REPOSITORY_URI
       - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
       - IMAGE_TAG=build-$(echo $CODEBUILD_BUILD_ID | awk -F":" '{print $2}')
@@ -35,7 +26,7 @@ phases:
       - printf '[{"name":"course-service","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
       - echo Writing image definitions file...
       # add your container name
-      - DOCKER_CONTAINER_NAME=demo-registry
+      - DOCKER_CONTAINER_NAME=javatechie-registry
       - printf '[{"name":"%s","imageUri":"%s"}]' $DOCKER_CONTAINER_NAME $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
       - echo $DOCKER_CONTAINER_NAME
       - echo printing imagedefinitions.json
@@ -44,4 +35,5 @@ phases:
 artifacts:
   files:
     - imagedefinitions.json
-    - target/demo11-0.0.1.jar
+    - target/course-service.jar
+
